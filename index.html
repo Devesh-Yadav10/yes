@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Love Themed Fullscreen Video</title>
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: radial-gradient(circle at top, #2a001f, #000);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: system-ui, sans-serif;
+      overflow: hidden;
+      color: white;
+    }
+
+    /* Floating cute icons */
+    .float {
+      position: absolute;
+      bottom: -20vh;
+      font-size: 18px;
+      opacity: 0;
+      animation: drift linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes drift {
+      0% {
+        transform: translateY(0) scale(0.8);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.4;
+      }
+      100% {
+        transform: translateY(-130vh) scale(1.4);
+        opacity: 0;
+      }
+    }
+
+    /* Love-themed button */
+    button#fsBtn {
+      background: linear-gradient(135deg, #ff3d81, #ff6fae);
+      border: none;
+      border-radius: 30px;
+      padding: 16px 36px;
+      font-size: 20px;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(255, 61, 129, 0.6);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      user-select: none;
+      letter-spacing: 1px;
+    }
+
+    button#fsBtn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 32px rgba(255, 61, 129, 0.85);
+    }
+
+    button#fsBtn:active {
+      transform: scale(0.95);
+    }
+
+    video {
+      display: none;
+      width: 100vw;
+      height: 100vh;
+      object-fit: contain;
+      background: black;
+    }
+
+    /* Confetti */
+    .confetti {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      animation: confetti-fall 2s ease-out forwards;
+    }
+
+    @keyframes confetti-fall {
+      from {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      to {
+        transform: translateY(120vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background music -->
+  <audio id="bgMusic" src="music.mp3" loop muted autoplay></audio>
+
+  <!-- Love-themed button -->
+  <button id="fsBtn">GO FULLSCREEN</button>
+
+  <!-- Video -->
+  <video id="video" playsinline>
+    <source src="video.mp4" type="video/mp4" />
+  </video>
+
+  <script>
+    // Floating graphics
+    const symbols = ["♡", "♥", "✦", "•"];
+    for (let i = 0; i < 22; i++) {
+      const el = document.createElement("div");
+      el.className = "float";
+      el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+      el.style.left = Math.random() * 100 + "vw";
+      el.style.animationDuration = 10 + Math.random() * 10 + "s";
+      el.style.animationDelay = Math.random() * 12 + "s";
+      document.body.appendChild(el);
+    }
+
+    // Confetti burst
+    function confettiBurst() {
+      for (let i = 0; i < 60; i++) {
+        const c = document.createElement("div");
+        c.className = "confetti";
+        c.style.left = Math.random() * 100 + "vw";
+        c.style.top = "-10px";
+        c.style.background =
+          ["#ff3d81", "#ffd1e8", "#fff"][Math.floor(Math.random() * 3)];
+        c.style.animationDuration = 1.5 + Math.random() + "s";
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 2000);
+      }
+    }
+
+    const button = document.getElementById("fsBtn");
+    const video = document.getElementById("video");
+    const music = document.getElementById("bgMusic");
+
+    button.addEventListener("click", async () => {
+      button.style.display = "none";
+      video.style.display = "block";
+
+      // Unmute and start music explicitly on user interaction
+      music.muted = false;
+      try {
+        await music.play();
+      } catch (e) {
+        console.warn("Music playback failed:", e);
+      }
+      music.volume = 0.5;
+
+      confettiBurst();
+
+      if (video.requestFullscreen) {
+        await video.requestFullscreen();
+      } else if (video.webkitEnterFullscreen) {
+        video.webkitEnterFullscreen();
+      }
+
+      video.play();
+
+      // Pause music after 1.2s for fade effect
+      setTimeout(() => music.pause(), 1200);
+    });
+  </script>
+
+</body>
+</html>
